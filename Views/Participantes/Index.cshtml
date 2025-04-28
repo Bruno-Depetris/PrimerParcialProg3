@@ -1,0 +1,152 @@
+﻿@model List<PrimerParcial.Models.Deportista>
+
+@{
+    ViewData["Title"] = "Listado de Participantes";
+}
+
+<div class="page-container">
+    <h2 class="section-title">Listado de Participantes</h2>
+
+    @if (!Model.Any())
+    {
+        <p class="no-data">No hay participantes registrados.</p>
+    }
+    else
+    {
+        <div class="table-container">
+            <table class="table table-hover table-striped table-bordered">
+                <thead class="table-header">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Disciplina</th>
+                        <th>Edad</th>
+                        <th>Ciudad</th>
+                    </tr>
+                </thead>
+                <tbody class="data">
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td>@p.Nombre</td>
+                            <td>@p.Disciplina</td>
+                            <td>@p.Edad</td>
+                            <td>@p.CiudadResidencia</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div class="button-container">
+        <a href="/Participantes/Create" class="btn-custom">➕ Registrar Nuevo</a>
+    </div>
+
+    <h3 class="section-title">Cantidad de participantes por disciplina</h3>
+
+    @if (ViewBag.ConteoPorDisciplina != null)
+    {
+        <div class="table-container">
+            <table class="table table-sm table-bordered">
+                <thead class="table-header">
+                    <tr>
+                        <th>Disciplina</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody class="data">
+                    @foreach (var item in ViewBag.ConteoPorDisciplina)
+                    {
+                        <tr>
+                            <td>@item.Disciplina</td>
+                            <td>@item.Cantidad</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<style>
+    body {
+        background: linear-gradient(to right, #1f1f1f, #2c2c2c);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #ffffff;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .page-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        border-radius: 40px;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 2rem;
+        color: #00bcd4;
+    }
+
+    .no-data {
+        text-align: center;
+        color: #ff5722;
+        font-size: 1.2rem;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        margin-bottom: 30px;
+        animation: fadeIn 1s ease;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #2c2c2c;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .data{
+        color:whitesmoke;
+    }
+    .table-header {
+        background-color: #00bcd4;
+        color: black;
+    }
+
+    th, td {
+        padding: 12px 15px;
+        text-align: center;
+    }
+
+    tr:hover {
+        background-color: #3a3a3a;
+    }
+
+    .button-container {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .btn-custom {
+        display: inline-block;
+        padding: 12px 30px;
+        background-color: #00bcd4;
+        color: black;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background 0.3s, transform 0.3s;
+    }
+
+    .btn-custom:hover {
+        background-color: #0097a7;
+        transform: scale(1.05);
+    }
+
+ 
+</style>

@@ -1,0 +1,97 @@
+﻿CREATE DATABASE Deportes;
+GO
+
+USE Deportes;
+GO
+
+CREATE TABLE Participantes (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nombre NVARCHAR(100) NOT NULL,
+    Disciplina NVARCHAR(50) NOT NULL CHECK (Disciplina IN ('Natación', 'Atletismo', 'Ciclismo', 'Otro')),
+    Edad INT NOT NULL CHECK (Edad >= 0),
+    CiudadResidencia NVARCHAR(100) NOT NULL
+);
+GO
+CREATE NONCLUSTERED INDEX IDX_Participantes_Disciplina
+ON Participantes (Disciplina);
+GO
+
+CREATE NONCLUSTERED INDEX IDX_Participantes_CiudadResidencia
+ON Participantes (CiudadResidencia);
+GO
+CREATE TABLE Participantes_Auditoria (
+    AuditoriaId INT IDENTITY(1,1) PRIMARY KEY,
+    ParticipanteId INT,
+    Operacion NVARCHAR(50),
+    Fecha DATETIME DEFAULT GETDATE()
+);
+GO
+CREATE TRIGGER TRG_Auditoria_Insert
+ON Participantes
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO Participantes_Auditoria (ParticipanteId, Operacion)
+    SELECT Id, 'INSERT'
+    FROM inserted;
+END;
+GO
+CREATE TRIGGER TRG_ValidarDisciplina
+ON Participantes
+AFTER UPDATE
+AS
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM inserted
+        WHERE Disciplina NOT IN ('Natación', 'Atletismo', 'Ciclismo', 'Otro')
+    )
+    BEGIN
+        RAISERROR('Disciplina no permitida', 16, 1);
+        ROLLBACK TRANSACTION;
+    END
+END;
+GO
+CREATE PROCEDURE SP_AgregarParticipante
+    @Nombre NVARCHAR(100),
+    @Disciplina NVARCHAR(50),
+    @Edad INT,
+    @CiudadResidencia NVARCHAR(100)
+AS
+BEGIN
+    INSERT INTO Participantes (Nombre, Disciplina, Edad, CiudadResidencia)
+    VALUES (@Nombre, @Disciplina, @Edad, @CiudadResidencia);
+END;
+GO
+CREATE PROCEDURE SP_MostrarParticipantes
+AS
+BEGIN
+    SELECT *
+    FROM Participantes
+    ORDER BY Nombre;
+END;
+GO
+CREATE PROCEDURE SP_EditarParticipante
+    @Id INT,
+    @Nombre NVARCHAR(100),
+    @Disciplina NVARCHAR(50),
+    @Edad INT,
+    @CiudadResidencia NVARCHAR(100)
+AS
+BEGIN
+    UPDATE Participantes
+    SET Nombre = @Nombre,
+        Disciplina = @Disciplina,
+        Edad = @Edad,
+        CiudadResidencia = @CiudadResidencia
+    WHERE Id = @Id;
+END;
+GO
+CREATE PROCEDURE SP_EliminarParticipante
+    @Id INT
+AS
+BEGIN
+    DELETE FROM Participantes
+    WHERE Id = @Id;
+END;
+GO
